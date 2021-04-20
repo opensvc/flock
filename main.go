@@ -27,9 +27,8 @@ type (
 )
 
 var (
-	truncate = os.Truncate
-	remove   = os.Remove
-	//defaultLockProvider = fcntllock.New
+	truncate      = os.Truncate
+	remove        = os.Remove
 	retryInterval = 500 * time.Millisecond
 )
 
