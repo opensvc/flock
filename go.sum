@@ -2,14 +2,8 @@ github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/golang/mock v1.5.0 h1:jlYHihg//f7RRwuPfptm04yp4s7O6Kw8EZiVYIGcH0g=
 github.com/golang/mock v1.5.0/go.mod h1:CWnOUgYIOo4TcNZ0wHX3YZCqsaM1I1Jvs6v3mP3KVu8=
-github.com/opensvc/fcntllock v0.0.2 h1:2THz4s8LLuQKaT0Vq6PJyB8ccrRhR5rUHDDi9UcRrN8=
-github.com/opensvc/fcntllock v0.0.2/go.mod h1:6roTI/HnYo0BTlu6p4mMDDzqkRRwKYOnINmdI8Ytbs0=
-github.com/opensvc/locker v0.0.1 h1:LC2B8NF5jwAUynQvBOC0zMWCnOCE31hD3lwa//04CAM=
-github.com/opensvc/locker v0.0.1/go.mod h1:EGM9u/OLJjie1vkNTaTlgj80+PpaH2zBUK/iPPOMCjY=
-github.com/opensvc/locker v0.0.2 h1:q7CylV9/7vG8YjS/Poa2WmDr2Jo62aIGWTiaCgxIxG0=
-github.com/opensvc/locker v0.0.2/go.mod h1:H/QSU7f5bULf/5PVOHZ58uEkyMF7RNkPfSEmP+E8qoM=
-github.com/opensvc/testhelper v0.0.2 h1:RjajedHeA7cew1tfYGxytJklNpDoiV34KIqwl0qKW8k=
-github.com/opensvc/testhelper v0.0.2/go.mod h1:fUJRZPmQs6iu4/gDlU8oTuTH7+c8vJ3uVOljkR6anL0=
+github.com/opensvc/locker v1.0.0 h1:in/89QxyiyOZtNAxTf25dYB9jYODKj+tTbT1SblzJpQ=
+github.com/opensvc/locker v1.0.0/go.mod h1:H/QSU7f5bULf/5PVOHZ58uEkyMF7RNkPfSEmP+E8qoM=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

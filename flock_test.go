@@ -4,13 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/golang/mock/gomock"
-	"github.com/opensvc/fcntllock"
 	"github.com/opensvc/locker"
 	mockLocker "github.com/opensvc/locker/mock_locker"
-	"github.com/opensvc/testhelper"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"path/filepath"
 	"testing"
 	"time"
 )
@@ -56,38 +52,6 @@ func TestLock(t *testing.T) {
 		err := New("foo.lck", "sessionId2", prov).Lock(100*time.Millisecond, "intent1")
 		assert.Equal(t, errors.New("can't lock"), err)
 	})
-
-	t.Run("can write, seek, read on locked file", func(t *testing.T) {
-		lockfile, tfCleanup := testhelper.TempFile(t)
-		defer tfCleanup()
-		l := New(lockfile, "sessionId3", fcntllock.New)
-		err := l.Lock(1*time.Second, "plop")
-		assert.Equal(t, nil, err)
-		dataToWrite := []byte("{}")
-		writeLen, err := l.Write(dataToWrite)
-		assert.Nil(t, err)
-		assert.Equal(t, 2, writeLen)
-		_, err = l.Seek(0, 0)
-		assert.Nil(t, err)
-		data := make([]byte, 200)
-		assert.Nil(t, err)
-		readLen, err := l.Read(data)
-		assert.Greater(t, readLen, 50)
-		_, err = os.Stat(lockfile)
-		assert.Nil(t, err)
-	})
-
-	t.Run("lock fail if lock dir doesn't exists", func(t *testing.T) {
-		lockDir, cleanup := testhelper.Tempdir(t)
-		defer cleanup()
-		defaultRetryInterval := retryInterval
-		defer func() { retryInterval = defaultRetryInterval }()
-		retryInterval = 5 * time.Millisecond
-		l := New(filepath.Join(lockDir, "dir", "lockfile"), "sessionOne", fcntllock.New)
-		err := l.Lock(15*time.Millisecond, "plop")
-		assert.NotNil(t, err)
-		assert.Equal(t, "lock timeout exceeded", err.Error())
-	})
 }
 
 func TestUnLock(t *testing.T) {
@@ -96,14 +60,6 @@ func TestUnLock(t *testing.T) {
 
 		mockLck.EXPECT().UnLock().Return(nil)
 		l := New("foo.lck", "sessionX", prov)
-
-		err := l.UnLock()
-		assert.Equal(t, nil, err)
-	})
-	t.Run("Ensure unlock (fcntl lock) succeed even if file is not locked", func(t *testing.T) {
-		lockfile, tfCleanup := testhelper.TempFile(t)
-		defer tfCleanup()
-		l := New(lockfile, "", fcntllock.New)
 
 		err := l.UnLock()
 		assert.Equal(t, nil, err)
