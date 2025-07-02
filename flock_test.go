@@ -3,12 +3,13 @@ package flock
 import (
 	"encoding/json"
 	"errors"
+	"testing"
+	"time"
+
 	"github.com/golang/mock/gomock"
 	"github.com/opensvc/locker"
 	mockLocker "github.com/opensvc/locker/mock_locker"
 	"github.com/stretchr/testify/assert"
-	"testing"
-	"time"
 )
 
 func setup(t *testing.T) (prov func(string) locker.Locker, lck *mockLocker.MockLocker) {
@@ -36,7 +37,7 @@ func TestLock(t *testing.T) {
 		err := lck.Lock(100*time.Millisecond, "intent1")
 		assert.Equal(t, nil, err)
 
-		found := meta{}
+		found := Meta{}
 		if err := json.Unmarshal(b, &found); err != nil {
 			t.Fatalf("expected written data : %+v\n", b)
 		}
