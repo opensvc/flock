@@ -4,14 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/opensvc/locker"
-	"io"
 	"os"
 	"time"
+
+	"github.com/opensvc/locker"
 )
 
 type (
-	// T wraps flock and dumps a json data in the lock file
+	// T wraps flock and dumps JSON data in the lock file
 	// hinting about what holds the lock.
 	T struct {
 		locker.Locker
@@ -19,10 +19,11 @@ type (
 		sessionId string
 	}
 
-	meta struct {
-		PID       int    `json:"pid"`
-		Intent    string `json:"intent"`
-		SessionID string `json:"session_id"`
+	Meta struct {
+		At        time.Time `json:"at"`
+		PID       int       `json:"pid"`
+		Intent    string    `json:"intent"`
+		SessionID string    `json:"session_id"`
 	}
 )
 
@@ -32,7 +33,7 @@ var (
 	retryInterval = 500 * time.Millisecond
 )
 
-// New allocate a file lock struct from Locker provider.
+// New allocate a file lock struct from the Locker provider.
 func New(p string, sessionId string, lockP func(string) locker.Locker) *T {
 	return &T{
 		Locker:    lockP(p),
@@ -41,11 +42,9 @@ func New(p string, sessionId string, lockP func(string) locker.Locker) *T {
 	}
 }
 
-//
-// Lock acquires an exclusive file lock on the file and write a json
+// Lock acquires an exclusive file lock on the file and writes a JSON
 // formatted structure hinting who holds the lock and with what
 // intention.
-//
 func (t *T) Lock(timeout time.Duration, intent string) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -56,18 +55,36 @@ func (t *T) Lock(timeout time.Duration, intent string) (err error) {
 		}
 		return
 	}
-	err = t.writeMeta(t, intent)
+	err = t.writeMeta(intent)
 	return
 }
 
-func (t T) writeMeta(w io.Writer, intent string) error {
-	m := meta{
+func (t *T) writeMeta(intent string) error {
+	m := Meta{
+		At:        time.Now(),
 		PID:       os.Getpid(),
 		Intent:    intent,
 		SessionID: t.sessionId,
 	}
-	enc := json.NewEncoder(w)
+	enc := json.NewEncoder(t)
 	return enc.Encode(m)
+}
+
+func (t *T) Probe(intent string) (m Meta, err error) {
+	err = t.Lock(time.Second*0, intent)
+	if err != nil {
+		return
+	}
+	defer func() { _ = t.UnLock() }()
+	m, err = t.readMeta()
+	return
+}
+
+func (t *T) readMeta() (Meta, error) {
+	var m Meta
+	dec := json.NewDecoder(t)
+	err := dec.Decode(&m)
+	return m, err
 }
 
 // UnLock releases the file lock acquired by Lock.
