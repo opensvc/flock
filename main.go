@@ -70,20 +70,29 @@ func (t *T) writeMeta(intent string) error {
 	return enc.Encode(m)
 }
 
-func (t *T) Probe(intent string) (m Meta, err error) {
-	err = t.Lock(time.Second*0, intent)
-	if err != nil {
-		return
+// Probe attempts to acquire a file lock. If successful, it releases the lock and returns an empty Meta.
+// If the lock is already held by another process, it reads and returns the current lock metadata.
+// Note: Reading the metadata may fail if the other process has not finished writing it.
+func (t *T) Probe() (Meta, error) {
+	err := t.TryLock()
+	if err == nil {
+		// lock acquired
+		_ = t.UnLock()
+		return Meta{}, nil
 	}
-	defer func() { _ = t.UnLock() }()
-	m, err = t.readMeta()
-	return
+	// lock conflict, read current lock meta
+	return t.readMeta()
 }
 
 func (t *T) readMeta() (Meta, error) {
 	var m Meta
-	dec := json.NewDecoder(t)
-	err := dec.Decode(&m)
+	file, err := os.Open(t.Path)
+	if err != nil {
+		return m, err
+	}
+	defer func() { _ = file.Close() }()
+	dec := json.NewDecoder(file)
+	err = dec.Decode(&m)
 	return m, err
 }
 
